@@ -10,7 +10,6 @@ import { PublicAppModule } from './public.app.module';
 import * as bodyParser from 'body-parser';
 import { Logger, NestInterceptor } from '@nestjs/common';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
-import { SocketAdapter } from './websockets/socket.adapter';
 import cookieParser from 'cookie-parser';
 import { PubSubListenerModule } from '@mvx-monorepo/common';
 import { LoggingInterceptor, MetricsService } from '@multiversx/sdk-nestjs-monitoring';
@@ -104,7 +103,6 @@ async function bootstrap() {
     },
   );
   pubSubApp.useLogger(pubSubApp.get(WINSTON_MODULE_NEST_PROVIDER));
-  pubSubApp.useWebSocketAdapter(new SocketAdapter(pubSubApp));
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
   pubSubApp.listen();
 
