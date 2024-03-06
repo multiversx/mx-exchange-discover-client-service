@@ -46,36 +46,6 @@
         ]
       }
     },
-    "queue-worker": {
-      "type": "application",
-      "root": "apps/queue-worker",
-      "entryFile": "main",
-      "sourceRoot": "apps/queue-worker/src",
-      "compilerOptions": {
-        "tsConfigPath": "apps/queue-worker/tsconfig.app.json",
-        "assets": [
-          {
-            "include": "../config/config.yaml",
-            "outDir": "./dist/apps/queue-worker/config"
-          }
-        ]
-      }
-    },
-    "cache-warmer": {
-      "type": "application",
-      "root": "apps/cache-warmer",
-      "entryFile": "main",
-      "sourceRoot": "apps/cache-warmer/src",
-      "compilerOptions": {
-        "tsConfigPath": "apps/cache-warmer/tsconfig.app.json",
-        "assets": [
-          {
-            "include": "../config/config.yaml",
-            "outDir": "./dist/apps/cache-warmer/config"
-          }
-        ]
-      }
-    },
     "common": {
       "type": "library",
       "root": "libs/common",
