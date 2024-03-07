@@ -1,10 +1,10 @@
 import { Controller, Get, ParseIntPipe, Query, UsePipes, ValidationPipe } from "@nestjs/common";
 import { ApiResponse, ApiTags } from "@nestjs/swagger";
-import { TaskCost } from "./dtos/task.cost";
 import { TasksService } from "./tasks.service";
-import { UserTask } from "./dtos/user.task";
-import { TaskCompletion } from "./dtos/task.completion";
 import { ParseAddressPipe } from "@multiversx/sdk-nestjs-common";
+import { TaskCostResponse } from "./dtos/task.cost.response";
+import { UserTaskResponse } from "./dtos/user.task.response";
+import { TaskCompletionResponse } from "./dtos/task.completion.response.";
 
 @Controller('xexchange-growth')
 @ApiTags('xexchange-growth')
@@ -18,11 +18,11 @@ export class TasksController {
   @ApiResponse({
     status: 200,
     description: 'Returns task cost for a specific week',
-    type: TaskCost,
+    type: TaskCostResponse,
   })
   async tasksCost(
     @Query('week', ParseIntPipe) week: number
-  ): Promise<TaskCost> {
+  ): Promise<TaskCostResponse> {
     return await this.tasksService.getCostForWeek(week);
   }
 
@@ -30,12 +30,12 @@ export class TasksController {
   @ApiResponse({
     status: 200,
     description: 'Returns a task for a user and a specific week',
-    type: UserTask,
+    type: UserTaskResponse,
   })
   async task(
     @Query('address', ParseAddressPipe) address: string,
     @Query('week', ParseIntPipe) week: number
-  ): Promise<UserTask> {
+  ): Promise<UserTaskResponse> {
     return await this.tasksService.getUserTaskForWeek(address, week);
   }
 
@@ -43,9 +43,12 @@ export class TasksController {
   @ApiResponse({
     status: 200,
     description: 'Returns completion status for a task',
-    type: TaskCompletion,
+    type: TaskCompletionResponse,
   })
-  async taskCompletion(): Promise<TaskCompletion> {
-    return await this.tasksService.getTaskCompletionForWeek('s', 1);
+  async taskCompletion(
+    @Query('address', ParseAddressPipe) address: string,
+    @Query('week', ParseIntPipe) week: number
+  ): Promise<TaskCompletionResponse> {
+    return await this.tasksService.getTaskCompletionForWeek(address, week);
   }
 }

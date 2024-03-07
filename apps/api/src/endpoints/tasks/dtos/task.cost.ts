@@ -7,18 +7,6 @@ export class TaskCost {
   @ApiProperty()
   money: number = 0;
 
-  @ApiProperty()
-  week: number = 0;
-
-  @ApiProperty()
-  isFinal: boolean = false;
-
-  @ApiProperty()
-  version: number = 2;
-
-  @ApiProperty()
-  signature: string = '';
-
   constructor(init?: Partial<TaskCost>) {
     Object.assign(this, init);
   }
