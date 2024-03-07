@@ -1,16 +1,8 @@
 urls:
   api: 'https://devnet-api.multiversx.com'
   swagger:
-    - 'https://devnet-microservice.multiversx.com'
-    - 'https://testnet-microservice.multiversx.com'
-    - 'https://microservice.multiversx.com'
+    - 'http://localhost:3000'
   redis: '127.0.0.1'
-database:
-  host: 'localhost'
-  port: 3306
-  username: 'root'
-  password: 'root'
-  name: 'example'
 features:
   publicApi:
     enabled: true
@@ -31,3 +23,5 @@ keepAliveTimeout:
   downstream: 61000
   upstream: 60000
 useCachingInterceptor: false
+discover:
+  projectId: 1

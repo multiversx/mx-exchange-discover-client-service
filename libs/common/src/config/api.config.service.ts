@@ -274,4 +274,14 @@ export class ApiConfigService {
   getNativeAuthAcceptedOrigins(): string[] {
     return this.configService.get<string[]>('nativeAuth.acceptedOrigins') ?? [];
   }
+
+  getDiscoverProjectId(): number {
+    const projectId = this.configService.get<number>('discover.projectId');
+
+    if (!projectId) {
+      throw new Error('No project ID present');
+    }
+
+    return projectId;
+  }
 }

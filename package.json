@@ -73,6 +73,8 @@
     "agentkeepalive": "^4.3.0",
     "bull": "^4.10.4",
     "cache-manager": "^5.2.1",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.1",
     "cookie-parser": "^1.4.6",
     "cron": "^3.1.6",
     "ioredis": "^5.3.2",
