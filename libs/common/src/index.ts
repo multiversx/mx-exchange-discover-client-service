@@ -6,3 +6,4 @@ export * from './pubsub';
 export * from './config';
 export * from './utils';
 export * from './health-check';
+export * from './signer';
