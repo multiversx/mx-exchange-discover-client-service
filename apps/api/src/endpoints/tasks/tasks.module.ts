@@ -1,9 +1,12 @@
 import { Module } from "@nestjs/common";
 import { TasksService } from "./tasks.service";
 import { TasksController } from "./tasks.controller";
+import { SignerModule } from "@mvx-monorepo/common";
 
 @Module({
-  imports: [],
+  imports: [
+    SignerModule,
+  ],
   providers: [
     TasksService,
   ],

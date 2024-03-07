@@ -6,7 +6,7 @@ import { UserTask } from "./dtos/user.task";
 import { UserTaskResponse } from "./dtos/user.task.response";
 import { TaskCompletionResponse } from "./dtos/task.completion.response.";
 import { Address } from "@multiversx/sdk-core/out";
-import { ApiConfigService } from "@mvx-monorepo/common";
+import { ApiConfigService, SignerService } from "@mvx-monorepo/common";
 
 const COMPLETTION_PREFIX = 'xExchangeGrowthV1TaskCompleted';
 
@@ -16,6 +16,7 @@ export class TasksService {
 
   constructor(
     private readonly apiConfigService: ApiConfigService,
+    private readonly signerService: SignerService
   ) { }
 
   async getCostForWeek(week: number): Promise<TaskCostResponse> {
@@ -24,14 +25,18 @@ export class TasksService {
     // this can be static or data pulled from a db
     const taskCost = this.staticTasksCost(week);
 
-    return await Promise.resolve(new TaskCostResponse({
+    const response = new TaskCostResponse({
       money: taskCost.money,
       time: taskCost.time,
       isFinal: true,
       week: week,
       version: 2,
-      signature: 'PAYLOAD_SIGNATURE', // todo: replace with actual signature
-    }));
+    });
+
+    const signature = await this.signerService.signPayload(TaskCostResponse.serializeForSigning(response));
+    response.signature = signature.toString('hex');
+
+    return response;
   }
 
   async getUserTaskForWeek(address: string, week: number): Promise<UserTaskResponse> {
@@ -40,15 +45,19 @@ export class TasksService {
     // this can be static or data pulled from a db
     const userTask = this.staticUserTasks(address, week);
 
-    return await Promise.resolve(new UserTaskResponse({
+    const response = new UserTaskResponse({
       url: userTask.url,
       description: userTask.description,
       address: address,
       week: week,
       isFinal: true,
       version: 2,
-      signature: 'PAYLOAD_SIGNATURE', // todo: replace with actual signature
-    }));
+    });
+
+    const signature = await this.signerService.signPayload(UserTaskResponse.serializeForSigning(response));
+    response.signature = signature.toString('hex');
+
+    return response;
   }
 
   async getTaskCompletionForWeek(address: string, week: number): Promise<TaskCompletionResponse> {
@@ -62,17 +71,22 @@ export class TasksService {
 
     if (taskCompleted) {
       completion = this.getCompletionPayload(address, userTask);
-      completionSignature = 'COMPLETION_SIGNATURE'; // todo: replace with actual signature
+      const completionSigBuffer = await this.signerService.signPayload(completion);
+      completionSignature = completionSigBuffer.toString('hex');
     }
 
-    return await Promise.resolve(new TaskCompletionResponse({
+    const response = new TaskCompletionResponse({
       completion: completion,
       address: address,
       completionSignature: completionSignature,
       version: 2,
       week: week,
-      signature: 'PAYLOAD_SIGNATURE', // todo: replace with actual signature
-    }));
+    });
+
+    const signature = await this.signerService.signPayload(TaskCompletionResponse.serializeForSigning(response));
+    response.signature = signature.toString('hex');
+
+    return response;
   }
 
   private getCompletionPayload(address: string, task: UserTask): string {
