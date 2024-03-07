@@ -284,4 +284,14 @@ export class ApiConfigService {
 
     return projectId;
   }
+
+  getDiscoverSignerPemPath(): string {
+    const signerPemPath = this.configService.get<string>('discover.signerPemPath');
+
+    if (!signerPemPath) {
+      throw new Error('No signer PEM path present');
+    }
+
+    return signerPemPath;
+  }
 }

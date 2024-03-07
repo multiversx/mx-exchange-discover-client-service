@@ -25,3 +25,4 @@ keepAliveTimeout:
 useCachingInterceptor: false
 discover:
   projectId: 1
+  signerPemPath: 
