@@ -20,9 +20,21 @@ export class UserTaskResponse {
   version: number = 2;
 
   @ApiProperty()
-  signature: string = '';
+  signature?: string = '';
 
   constructor(init?: Partial<UserTaskResponse>) {
     Object.assign(this, init);
+  }
+
+  static serializeForSigning(userTaskResponse: UserTaskResponse): string {
+    delete userTaskResponse.signature;
+
+    const sortedKeys = Object.keys(userTaskResponse).sort();
+    const sortedObject: { [key: string]: any } = {};
+    sortedKeys.forEach(key => {
+      sortedObject[key] = userTaskResponse[key as keyof UserTaskResponse];
+    });
+
+    return JSON.stringify(sortedObject);
   }
 }

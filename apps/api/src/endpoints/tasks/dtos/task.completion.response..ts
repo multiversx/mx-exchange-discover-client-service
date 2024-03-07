@@ -17,9 +17,21 @@ export class TaskCompletionResponse {
   version: number = 2;
 
   @ApiProperty()
-  signature: string = '';
+  signature?: string = '';
 
   constructor(init?: Partial<TaskCompletionResponse>) {
     Object.assign(this, init);
+  }
+
+  static serializeForSigning(taskCompletionResponse: TaskCompletionResponse): string {
+    delete taskCompletionResponse.signature;
+
+    const sortedKeys = Object.keys(taskCompletionResponse).sort();
+    const sortedObject: { [key: string]: any } = {};
+    sortedKeys.forEach(key => {
+      sortedObject[key] = taskCompletionResponse[key as keyof TaskCompletionResponse];
+    });
+
+    return JSON.stringify(sortedObject);
   }
 }
