@@ -274,4 +274,23 @@ export class ApiConfigService {
   getNativeAuthAcceptedOrigins(): string[] {
     return this.configService.get<string[]>('nativeAuth.acceptedOrigins') ?? [];
   }
+
+  getPublicApiPrefix(): string {
+    const prefix = this.configService.get<string>('features.publicApi.prefix');
+
+    if (!prefix) {
+      return '';
+    }
+
+    return prefix;
+  }
+
+  getDiscoverSignerPemPath(): string {
+    const signerPemPath = this.configService.get<string>('discover.signerPemPath');
+
+    if (!signerPemPath) {
+      return '';
+    }
+    return signerPemPath;
+  }
 }
