@@ -6,7 +6,7 @@ import { UserTask } from "./dtos/user.task";
 import { UserTaskResponse } from "./dtos/user.task.response";
 import { TaskCompletionResponse } from "./dtos/task.completion.response.";
 import { Address } from "@multiversx/sdk-core/out";
-import { ApiConfigService, SignerService } from "@mvx-monorepo/common";
+import { SignerService } from "@mvx-monorepo/common";
 
 const COMPLETTION_PREFIX = 'xExchangeGrowthV1TaskCompleted';
 
@@ -15,12 +15,11 @@ export class TasksService {
   private readonly logger: OriginLogger = new OriginLogger(TasksService.name);
 
   constructor(
-    private readonly apiConfigService: ApiConfigService,
     private readonly signerService: SignerService
   ) { }
 
-  async getCostForWeek(week: number): Promise<TaskCostResponse> {
-    this.logger.log(`Returning task cost for week ${week}`);
+  async getCostForWeek(projectId: number, week: number): Promise<TaskCostResponse> {
+    this.logger.log(`Returning week ${week} task cost for project ${projectId}`);
 
     // this can be static or data pulled from a db
     const taskCost = this.staticTasksCost(week);
@@ -39,8 +38,8 @@ export class TasksService {
     return response;
   }
 
-  async getUserTaskForWeek(address: string, week: number): Promise<UserTaskResponse> {
-    this.logger.log(`Returning user ${address} task for week ${week}`);
+  async getUserTaskForWeek(projectId: number, address: string, week: number): Promise<UserTaskResponse> {
+    this.logger.log(`Returning user ${address} week ${week} task for project ${projectId}`);
 
     // this can be static or data pulled from a db
     const userTask = this.staticUserTasks(address, week);
@@ -60,9 +59,7 @@ export class TasksService {
     return response;
   }
 
-  async getTaskCompletionForWeek(address: string, week: number): Promise<TaskCompletionResponse> {
-    this.logger.log(`Returning user ${address} task for week ${week}`);
-
+  async getTaskCompletionForWeek(projectId: number, address: string, week: number): Promise<TaskCompletionResponse> {
     const userTask = this.staticUserTasks(address, week);
     const taskCompleted = await this.checkUserCompletedTask(address, userTask);
 
@@ -70,8 +67,8 @@ export class TasksService {
     let completionSignature = '';
 
     if (taskCompleted) {
-      completion = this.getCompletionPayload(address, userTask);
-      const completionSigBuffer = await this.signerService.signPayload(completion);
+      completion = this.getCompletionPayload(projectId, address, userTask);
+      const completionSigBuffer = await this.signerService.signPayload(completion, 'hex');
       completionSignature = completionSigBuffer.toString('hex');
     }
 
@@ -89,10 +86,12 @@ export class TasksService {
     return response;
   }
 
-  private getCompletionPayload(address: string, task: UserTask): string {
+  private getCompletionPayload(projectId: number, address: string, task: UserTask): string {
     const prefixBuffer = Buffer.from(BinaryUtils.stringToHex(COMPLETTION_PREFIX), 'hex');
 
-    const projectId = this.apiConfigService.getDiscoverProjectId();
+    const prefixBufferLength = Buffer.alloc(4, undefined, 'hex');
+    prefixBufferLength.writeUInt32BE(prefixBuffer.length, 0);
+
     const projectBuffer = Buffer.alloc(4, undefined, 'hex');
     projectBuffer.writeUInt32BE(projectId, 0);
 
@@ -103,7 +102,12 @@ export class TasksService {
 
     const noteBuffer = Buffer.from(BinaryUtils.stringToHex(task.identifier), 'hex');
 
-    const message: Buffer = Buffer.concat([prefixBuffer, projectBuffer, weekBuffer, addressBuffer, noteBuffer]);
+    const noteBufferLength = Buffer.alloc(4, undefined, 'hex');
+    noteBufferLength.writeUInt32BE(noteBuffer.length, 0);
+
+    const message: Buffer = Buffer.concat([
+      prefixBufferLength, prefixBuffer, projectBuffer, weekBuffer, addressBuffer, noteBufferLength, noteBuffer,
+    ]);
 
     return message.toString('hex');
   }
@@ -135,11 +139,16 @@ export class TasksService {
         money: 4,
         time: 10,
       },
-      {
-        week: 4,
-        money: 4,
-        time: 10,
-      },
+      // {
+      //   week: 4,
+      //   money: 4,
+      //   time: 10,
+      // },
+      // {
+      //   week: 5,
+      //   money: 4,
+      //   time: 10,
+      // },
     ];
 
     const currentWeekCost = allWeeksCost.find(elem => elem.week === week);
@@ -156,25 +165,31 @@ export class TasksService {
       {
         week: 1,
         identifier: '3f5Gc8',
-        url: '<TASK_URL_HERE>',
+        url: 'https://test.com',
         description: '<DESCRIPTION>',
       },
       {
         week: 2,
-        identifier: 'bS19kl',
-        url: '<TASK_URL_HERE>',
+        identifier: '4214wsr',
+        url: 'https://test.com',
         description: '<DESCRIPTION>',
       },
       {
         week: 3,
-        identifier: 'yv5NL2',
-        url: '<TASK_URL_HERE>',
+        identifier: 'test',
+        url: 'https://test.com',
         description: '<DESCRIPTION>',
       },
       {
         week: 4,
         identifier: 'mU76pP',
-        url: '<TASK_URL_HERE>',
+        url: 'https://test.com',
+        description: '<DESCRIPTION>',
+      },
+      {
+        week: 5,
+        identifier: 'mU76pP',
+        url: 'https://test.com',
         description: '<DESCRIPTION>',
       },
     ];
