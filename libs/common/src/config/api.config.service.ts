@@ -275,23 +275,22 @@ export class ApiConfigService {
     return this.configService.get<string[]>('nativeAuth.acceptedOrigins') ?? [];
   }
 
-  getDiscoverProjectId(): number {
-    const projectId = this.configService.get<number>('discover.projectId');
+  getPublicApiPrefix(): string {
+    const prefix = this.configService.get<string>('features.publicApi.prefix');
 
-    if (!projectId) {
-      throw new Error('No project ID present');
+    if (!prefix) {
+      return '';
     }
 
-    return projectId;
+    return prefix;
   }
 
   getDiscoverSignerPemPath(): string {
     const signerPemPath = this.configService.get<string>('discover.signerPemPath');
 
     if (!signerPemPath) {
-      throw new Error('No signer PEM path present');
+      return '';
     }
-
     return signerPemPath;
   }
 }

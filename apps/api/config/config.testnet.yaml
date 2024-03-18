@@ -7,6 +7,7 @@ features:
   publicApi:
     enabled: true
     port: 3000
+    prefix: 'discover-client'
   privateApi:
     enabled: true
     port: 4000
@@ -24,5 +25,4 @@ keepAliveTimeout:
   upstream: 60000
 useCachingInterceptor: false
 discover:
-  projectId: 1
   signerPemPath: 

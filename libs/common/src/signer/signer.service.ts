@@ -6,22 +6,28 @@ import { ApiConfigService } from '../config';
 
 @Injectable()
 export class SignerService {
-  private userSigner: UserSigner;
-  private signerAddress: string;
+  private userSigner: UserSigner | undefined;
+  private signerAddress: string | undefined;
 
   constructor(
     private readonly apiConfigService: ApiConfigService,
   ) {
     const pemFilePath = this.apiConfigService.getDiscoverSignerPemPath();
+    if (pemFilePath === '') {
+      return;
+    }
+
     const pemFileContent = readFileSync(pemFilePath, 'utf8');
 
     this.userSigner = UserSigner.fromPem(pemFileContent);
     this.signerAddress = this.userSigner.getAddress().bech32();
   }
 
-  async signPayload(payload: string): Promise<Buffer> {
-    console.log(payload);
-    const message = Buffer.from(payload, 'utf-8');
+  async signPayload(payload: string, encoding: BufferEncoding = 'utf-8'): Promise<Buffer> {
+    if (!this.userSigner) {
+      return Buffer.from('');
+    }
+    const message = Buffer.from(payload, encoding);
 
     return await this.userSigner.sign(message);
   }
@@ -32,11 +38,11 @@ export class SignerService {
     return verifier.verify(payload, signature);
   }
 
-  getAddress(): string {
+  getAddress(): string | undefined {
     return this.signerAddress;
   }
 
-  getSigner(): UserSigner {
+  getSigner(): UserSigner | undefined {
     return this.userSigner;
   }
 }

@@ -34,6 +34,7 @@ async function bootstrap() {
   const cachingService = publicApp.get<CacheService>(CacheService);
   const metricsService = publicApp.get<MetricsService>(MetricsService);
   const httpAdapterHostService = publicApp.get<HttpAdapterHost>(HttpAdapterHost);
+  const globalPrefix = apiConfigService.getPublicApiPrefix();
 
   if (apiConfigService.getIsAuthActive()) {
     publicApp.useGlobalGuards(new NativeAuthGuard(new SdkNestjsConfigServiceImpl(apiConfigService), cachingService));
@@ -57,6 +58,7 @@ async function bootstrap() {
   }
 
   publicApp.useGlobalInterceptors(...globalInterceptors);
+  publicApp.setGlobalPrefix(globalPrefix);
 
   const description = readFileSync(join(__dirname, '..', 'docs', 'swagger.md'), 'utf8');
 
@@ -74,7 +76,7 @@ async function bootstrap() {
   const config = documentBuilder.build();
 
   const document = SwaggerModule.createDocument(publicApp, config);
-  SwaggerModule.setup('', publicApp, document);
+  SwaggerModule.setup(`${globalPrefix}/docs`, publicApp, document);
 
   if (apiConfigService.getIsPublicApiFeatureActive()) {
     await publicApp.listen(apiConfigService.getPublicApiFeaturePort());
